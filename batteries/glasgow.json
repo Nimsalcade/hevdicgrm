@@ -1,0 +1,52 @@
+{
+  "about": "Glasgow Norms (Scott et al. 2019, Behavior Research Methods): 5,553 English words rated on nine scales, including 379 ambiguous words rated alone and with a cue that picks out one sense, as in \"toast (bread)\". Expects a tidy CSV with a 'word' column and one column of mean ratings per scale, named with the paper's codes. The questions paraphrase the original instructions, and the levels mirror the human scales point for point.",
+  "word_column": "word",
+  "state_template": "Word: {word}\nIf the word is followed by a cue in brackets, rate only the meaning the cue picks out.",
+  "dimensions": {
+    "arousal": {
+      "column": "AROU",
+      "instructions": "How arousing is this word: how calm or excited does it make you feel?",
+      "levels": ["1 (very calm)", "2", "3", "4", "5", "6", "7", "8", "9 (very excited)"]
+    },
+    "valence": {
+      "column": "VAL",
+      "instructions": "How negative or positive is this word: how unpleasant or pleasant does it make you feel?",
+      "levels": ["1 (very negative)", "2", "3", "4", "5", "6", "7", "8", "9 (very positive)"]
+    },
+    "dominance": {
+      "column": "DOM",
+      "instructions": "How much control does this word make you feel: does it leave you feeling controlled, or in control?",
+      "levels": ["1 (very controlled)", "2", "3", "4", "5", "6", "7", "8", "9 (very in control)"]
+    },
+    "concreteness": {
+      "column": "CNC",
+      "instructions": "How concrete is this word? Concrete words refer to things you can experience with your senses; abstract words refer to ideas you cannot.",
+      "levels": ["1 (very abstract)", "2", "3", "4", "5", "6", "7 (very concrete)"]
+    },
+    "imageability": {
+      "column": "IMAG",
+      "instructions": "How easy is it to form a mental image of what this word means?",
+      "levels": ["1 (very hard to imagine)", "2", "3", "4", "5", "6", "7 (very easy to imagine)"]
+    },
+    "familiarity": {
+      "column": "FAM",
+      "instructions": "How familiar is this word to an adult native speaker of English: how often do they see, hear or use it?",
+      "levels": ["1 (very unfamiliar)", "2", "3", "4", "5", "6", "7 (very familiar)"]
+    },
+    "age_of_acquisition": {
+      "column": "AOA",
+      "instructions": "At what age do people typically learn this word?",
+      "levels": ["0-2 years", "2-4 years", "4-6 years", "6-8 years", "8-10 years", "10-12 years", "13 years or older"]
+    },
+    "size": {
+      "column": "SIZE",
+      "instructions": "How big is the thing or idea this word refers to, in its dimensions, magnitude or extent?",
+      "levels": ["1 (very small)", "2", "3", "4", "5", "6", "7 (very big)"]
+    },
+    "gender": {
+      "column": "GEND",
+      "instructions": "How strongly is this word associated with feminine or masculine behaviour?",
+      "levels": ["1 (very feminine)", "2", "3", "4", "5", "6", "7 (very masculine)"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hevdicgrm"
+version = "0.1.0"
+description = "Experiments combining Jev, a dictionary and a grammar."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["typesafe-sdk>=0.7.5"]
+
+[project.scripts]
+normcheck = "hevdicgrm.normcheck:main"
