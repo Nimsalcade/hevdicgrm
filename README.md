@@ -66,10 +66,49 @@ A battery is a JSON file:
 The levels must match the human scale point for point, because the sense check measures gaps in scale points. The
 shipped batteries paraphrase the original rating instructions rather than quoting them.
 
-### Tests
+## tagexp: can labels stand in for text?
+
+The plan's training bet is that a model learns faster from text whose words carry their sense and their role in
+the sentence. Real text can't test that cleanly, because its senses and roles are never known exactly. So `tagexp`
+runs the test in a synthetic language (`toyworld`) that is generated from senses and roles. It has the
+properties the bet depends on:
+
+- **Homonyms.** 40% of content-word tokens are ambiguous between two senses.
+- **Meaning constraints.** "eat" needs food, and "clever" needs a person or an idea.
+- **Grammar.** Number agreement holds across relative clauses.
+- **A long tail of rare words.** Words within a class follow a Zipf distribution.
+
+Every arm trains the same small transformer (`tinylm`: NumPy, gradients checked against finite differences) on the
+same text. The arms differ only in what else the model must predict for each token:
+
+| Arm | Extra targets | Real-world source |
+| --- | --- | --- |
+| `plain` | none | |
+| `roles` | grammatical role | a parser |
+| `sense-sets` | every sense the word can have | a dictionary alone, as in SenseBERT |
+| `senses` | the sense in context | a dictionary plus a perfect Jev |
+| `roles+sense-sets` | both cheap labels | parser and dictionary, no Jev |
+| `roles+senses` | everything | |
+| `roles+senses-noisy` | 30% of ambiguous words get the wrong sense, 10% of roles are wrong | an imperfect Jev and parser |
+| `random-classes` | a fixed random class per word | a control: regularizes like a sense head but means nothing |
+
+Every model is tested on raw text alone, so labels can only help through what the model learned from them. Each run
+trains until held-out loss stops improving, then reports:
+
+- held-out loss;
+- accuracy on agreement across a relative clause;
+- accuracy on meaning constraints (a 2×2 design that cancels out word frequency);
+- accuracy on picking a homonym's sense from an adjective that cues it.
+
+```sh
+PYTHONPATH=src python -m hevdicgrm.tagexp run --out results/tagexp.jsonl --seeds 0 1 2
+PYTHONPATH=src python -m hevdicgrm.tagexp report results/tagexp.jsonl
+```
+
+## Tests
 
 ```sh
 PYTHONPATH=src python -m unittest discover -s tests
 ```
 
-The tests use a fake client, so they run without the SDK, an API key or network access.
+The tests use fakes in place of Jev, so they run without the SDK, an API key or network access.
