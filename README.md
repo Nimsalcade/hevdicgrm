@@ -141,17 +141,24 @@ What the runs show:
 4. **Wrong labels hurt only when text is scarcest.** With 30% of ambiguous words given the wrong sense and 10% of
    roles wrong, accuracy drops 20 points at 10k tokens and not at all from 20k on. Merging classes into a coarser
    inventory costs 3 to 7 points.
-5. **The dictionary covers words the text never shows.** UNSEEN
+5. **The dictionary covers words the text never shows.** On test items where neither noun appeared in the training
+   text (75 of 2,000 items at 10k tokens), the model with all three no-Jev labels scores 96.9% ± 3.1. The plain
+   model scores 51%, which is chance, and the random-lexicon control 48%. The lexicon alone is unstable at 10k tokens
+   (61% ± 17) and reaches 96% at 20k, where only 17 such items remain.
 6. **The grammar labels' effect on agreement is clear only at the smallest size.** At 10k tokens, roles add
    11.6 ± 3.0 points on agreement and random classes add 1.3 ± 2.8. At 40k tokens, random classes add as much as
    roles do (27 against 23 points), so past the smallest size an extra per-word head helps agreement whatever it
-   predicts. DROPOUT
+   predicts. More dropout doesn't explain it: raising the plain model's dropout from 0.1 to 0.2 or 0.3 lowers
+   every score it gets (meaning constraints at 40k tokens: 77%, 71%, 62%), so the default was already its best
+   setting, and no amount of dropout brings it near the labelled arms.
 7. **Held-out loss improves by about twice the text's worth.** With the three no-Jev labels, the loss on plain text
    is as low as the plain model reaches with 1.8× the text at 10k tokens, 2.3× at 20k, 1.8× at 40k, 1.45× at 80k
    and 1.0× at 200k.
 8. **With enough text, the plain model catches up.** By 80k tokens it gets 99.7% on meaning constraints.
 
-BIGGER
+A model 4 layers deep and 128 wide, instead of 2 and 64, shows the same gain at 20k tokens: meaning constraints at
+59% plain, 96% with sense lists and 99.8% with all three no-Jev labels. Its extra capacity lifts the plain model's
+agreement from 68% to 84%, so the labels add less there (to 93%).
 
 **What this means for the plan.** In this language, dictionary and grammar labels are worth several times more text,
 but only while text is scarce: the plain model catches up once it has seen each word a few dozen times. That makes
