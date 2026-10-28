@@ -98,6 +98,7 @@ COARSE_LABELS = ["F", *sorted(set(COARSE.values()))]
 SIZES = (10_000, 20_000, 40_000, 80_000, 200_000)
 BUCKETS = ((0, 0), (1, 3), (4, 10), (11, 30), (31, 100), (101, None))  # training occurrences of the target word
 RARE = 10  # a word seen at most this often in training counts as rare
+CEILING = 0.99  # accuracy past which multipliers are only lower bounds
 
 
 @dataclass(frozen=True)
@@ -324,7 +325,9 @@ def evaluate(params: tinylm.Params, cfg: tinylm.Config, m: dict, counts: np.ndar
 
     selection = crossed(m["selection"])
     fewest = np.array([min(counts[word[n]] for n in item["nouns"]) for item in m["selection"]])
-    rare_nouns, unseen_nouns = fewest <= RARE, fewest == 0
+    most = np.array([max(counts[word[n]] for n in item["nouns"]) for item in m["selection"]])
+    # With one noun unseen, the seen noun can carry an item; with both unseen, only the dictionary can.
+    rare_nouns, unseen_nouns, both_unseen = fewest <= RARE, fewest == 0, most == 0
     sense = crossed(m["sense"])
     return {
         "test_loss": float(losses.mean()),
@@ -336,6 +339,8 @@ def evaluate(params: tinylm.Params, cfg: tinylm.Config, m: dict, counts: np.ndar
         "selection_rare_n": int(rare_nouns.sum()),
         "selection_unseen": float(selection[unseen_nouns].mean()) if unseen_nouns.any() else None,
         "selection_unseen_n": int(unseen_nouns.sum()),
+        "selection_both_unseen": float(selection[both_unseen].mean()) if both_unseen.any() else None,
+        "selection_both_unseen_n": int(both_unseen.sum()),
         "sense": float(sense.mean()),
     }
 
@@ -431,7 +436,8 @@ def report(paths: list[Path]) -> str:
     lines += table("Agreement across a relative clause (accuracy)", "agreement", ".1%")
     lines += table("Meaning constraints on objects (accuracy, chance 50%)", "selection", ".1%")
     lines += table(f"... where a noun was seen at most {RARE} times", "selection_rare", ".1%")
-    lines += table("... where a noun never appeared in training", "selection_unseen", ".1%")
+    lines += table("... where at least one noun never appeared in training", "selection_unseen", ".1%")
+    lines += table("... where neither noun appeared in training", "selection_both_unseen", ".1%")
     lines += table("Picking a homonym's sense from context (accuracy, chance 50%)", "sense", ".1%")
     for key, title, sign in (
         ("test_loss", "held-out loss", 1),
@@ -445,7 +451,15 @@ def report(paths: list[Path]) -> str:
         lines.append(f"Text multiplier on {title}: how many times more text the plain model needs to match each arm")
         lines.append(f"{'arm':<26}" + "".join(f"{s:>16,}" for s in sizes))
         for arm in arms:
-            row = [_multiplier(plain, s, None if (v := mean(arm, s, key)) is None else sign * v) for s in sizes]
+            row = []
+            for s in sizes:
+                v = mean(arm, s, key)
+                if v is not None and sign < 0 and v >= CEILING:
+                    # At the ceiling, the arm got there no later than this: the multiplier is a lower bound.
+                    base = mean("plain", s, key)
+                    row.append("-" if base is not None and base >= CEILING else f">={_multiplier(plain, s, -CEILING)}")
+                else:
+                    row.append(_multiplier(plain, s, None if v is None else sign * v))
             lines.append(f"{arm:<26}" + "".join(f"{v:>16}" for v in row))
         lines.append("")
     lines.append("Multipliers interpolate the plain model's results linearly in log text size; '>' means past the largest size.")
@@ -488,18 +502,24 @@ def report(paths: list[Path]) -> str:
 
 EXPORT_FIELDS = (
     "arm", "size", "seed", "test_loss", "rare_loss", "agreement", "selection",
-    "selection_rare", "selection_unseen", "sense", "dev_loss", "best_step", "steps",
+    "selection_rare", "selection_unseen", "selection_both_unseen", "sense", "dev_loss", "best_step", "steps",
 )  # fmt: skip
 
 
 def export(paths: list[Path]) -> list[dict]:
-    """One flat row per run, for charts: the fields that summarise it, without its learning curve."""
+    """One flat row per run, for charts: the fields that summarise it, without its learning curve.
+
+    `setting` is "main" for runs with the default settings, else the settings that differ, as "dropout=0.2".
+    """
+    defaults = asdict(Settings())
     rows = []
     for path in paths:
         for line in path.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
-            rows.append({k: r.get(k) for k in EXPORT_FIELDS})
-    return sorted(rows, key=lambda r: (list(ARMS).index(r["arm"]), r["size"], r["seed"]))
+            changed = {k: v for k, v in r["settings"].items() if defaults.get(k) != v}
+            setting = ", ".join(f"{k}={v}" for k, v in sorted(changed.items())) or "main"
+            rows.append({"setting": setting, **{k: r.get(k) for k in EXPORT_FIELDS}})
+    return sorted(rows, key=lambda r: (r["setting"] != "main", r["setting"], list(ARMS).index(r["arm"]), r["size"], r["seed"]))
 
 
 # Each comparison isolates one question: (question, arm, the arm it is compared with).
