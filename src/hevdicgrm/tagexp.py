@@ -19,6 +19,8 @@ differ only in what else the model must predict at each token:
                          used as a table, and it covers words the training text never shows.
     roles+sense-sets+lexicon   everything that needs no Jev
     random-lexicon       a control for lexicon: a fixed random class per word
+    coarse-sense-sets    as sense-sets, but with classes merged into a coarser inventory, as real
+                         dictionaries' categories are coarser than the distinctions words draw
 
 All arms are tested on raw text alone, so labels can only help through what the model learned from
 them. The report compares held-out loss, accuracy on targeted test items, and how much more text the
@@ -69,7 +71,29 @@ ARMS = {
     "lexicon": Arm(lexicon="sets"),
     "roles+sense-sets+lexicon": Arm(roles=True, senses="set", lexicon="sets"),
     "random-lexicon": Arm(lexicon="random"),
+    "coarse-sense-sets": Arm(senses="coarse"),
 }
+
+# A coarser inventory than the language's own classes, as WordNet's supersenses are coarser than the
+# distinctions English words actually draw. Merging classes makes the labels say less than the truth:
+# they can't tell "eat" from "drink", or food from drink, so those constraints must come from text.
+COARSE = {
+    "N:person": "N:creature", "N:animal": "N:creature",
+    "N:food": "N:consumable", "N:drink": "N:consumable",
+    "N:tool": "N:artifact", "N:vehicle": "N:artifact", "N:building": "N:artifact",
+    "N:land": "N:nature", "N:plant": "N:nature",
+    "N:idea": "N:abstract", "N:event": "N:abstract",
+    "V:eat": "V:consume", "V:drink": "V:consume",
+    "V:hold": "V:handle", "V:drive": "V:handle", "V:build": "V:handle",
+    "V:see": "V:perceive", "V:visit": "V:perceive", "V:discuss": "V:perceive",
+    "V:sleep": "V:change", "V:grow": "V:change", "V:rot": "V:change",
+    "V:break": "V:change", "V:happen": "V:change", "V:matter": "V:change",
+    "A:color": "A:appearance", "A:size": "A:appearance",
+    "A:taste": "A:material", "A:metal": "A:material",
+    "A:mood": "A:mental", "A:clever": "A:mental",
+    "A:fast": "A:behaviour", "A:wild": "A:behaviour",
+}  # fmt: skip
+COARSE_LABELS = ["F", *sorted(set(COARSE.values()))]
 
 SIZES = (10_000, 20_000, 40_000, 80_000, 200_000)
 BUCKETS = ((0, 0), (1, 3), (4, 10), (11, 30), (31, 100), (101, None))  # training occurrences of the target word
@@ -114,6 +138,15 @@ def lexicon_table(world: World) -> np.ndarray:
     return table
 
 
+def coarse_table(world: World) -> np.ndarray:
+    """(vocab, coarse labels) mask of every coarse label each word form can have."""
+    index = {label: i for i, label in enumerate(COARSE_LABELS)}
+    projection = np.zeros((len(world.senses), len(COARSE_LABELS)), dtype=np.int32)
+    for i, sense in enumerate(world.senses):
+        projection[i, index[COARSE.get(sense, sense)]] = 1  # "F" maps to itself
+    return (lexicon_table(world).astype(np.int32) @ projection) > 0
+
+
 def encode(world: World, tokens: list[Token]) -> Encoded:
     word = {w: i for i, w in enumerate(world.vocab)}
     sense = {s: i for i, s in enumerate(world.senses)}
@@ -156,7 +189,8 @@ def materials(settings: Settings, max_size: int) -> dict:
 
 
 def config(settings: Settings, world: World, arm: Arm) -> tinylm.Config:
-    tag_sizes = ((len(world.roles),) if arm.roles else ()) + ((len(world.senses),) if arm.senses else ())
+    sense_labels = len(COARSE_LABELS) if arm.senses == "coarse" else len(world.senses)
+    tag_sizes = ((len(world.roles),) if arm.roles else ()) + ((sense_labels,) if arm.senses else ())
     return tinylm.Config(
         vocab=len(world.vocab),
         tag_sizes=tag_sizes,
@@ -170,19 +204,27 @@ def config(settings: Settings, world: World, arm: Arm) -> tinylm.Config:
 
 
 def train(
-    settings: Settings, cfg: tinylm.Config, data: Encoded, dev: np.ndarray, arm: Arm, seed: int, table: np.ndarray | None = None
+    settings: Settings,
+    cfg: tinylm.Config,
+    data: Encoded,
+    dev: np.ndarray,
+    arm: Arm,
+    seed: int,
+    tables: dict[str, np.ndarray] | None = None,
 ) -> tuple[tinylm.Params, dict]:
     """Train until held-out loss stops improving; return the best parameters seen.
 
-    `table` is the dictionary (vocab x senses) the lexicon arms learn from.
+    `tables` holds the dictionary as (vocab x labels) masks: "sets" for every sense of each form,
+    which the lexicon arms learn from, and "coarse" for the coarse-sense arm.
     """
     rng = np.random.default_rng(seed)
     params = tinylm.init(cfg, rng)
     lexicon = None
     if arm.lexicon == "sets":
-        lexicon = table
+        lexicon = tables["sets"]
     elif arm.lexicon == "random":
-        lexicon = np.eye(table.shape[1], dtype=bool)[np.random.default_rng(12345).integers(0, table.shape[1], cfg.vocab)]
+        n_labels = tables["sets"].shape[1]
+        lexicon = np.eye(n_labels, dtype=bool)[np.random.default_rng(12345).integers(0, n_labels, cfg.vocab)]
     if lexicon is not None:
         params["lex_w"] = rng.normal(0, 0.02, (cfg.width, lexicon.shape[1])).astype(np.float32)
         params["lex_b"] = np.zeros(lexicon.shape[1], dtype=np.float32)
@@ -199,6 +241,8 @@ def train(
     elif arm.senses == "random":
         classes = np.random.default_rng(12345).integers(0, n_senses, cfg.vocab)
         heads.append(lambda idx: np.eye(n_senses, dtype=bool)[classes[data.ids[idx]]])
+    elif arm.senses == "coarse":
+        heads.append(lambda idx: tables["coarse"][data.ids[idx]])
     t = cfg.context
     # Check held-out loss about every half pass over the training text: small sets overfit within a few passes.
     every = max(10, min(settings.eval_every, len(data.ids) // (2 * settings.batch * t)))
@@ -303,7 +347,8 @@ def run_one(job: tuple[Settings, str, int, int, int]) -> dict:
     data = Encoded(*(getattr(m["train"], f)[:size] for f in ("ids", "senses", "sense_sets", "roles")))
     cfg = config(settings, m["world"], arm)
     start = time.time()
-    params, info = train(settings, cfg, data, m["dev"], arm, seed, lexicon_table(m["world"]))
+    tables = {"sets": lexicon_table(m["world"]), "coarse": coarse_table(m["world"])}
+    params, info = train(settings, cfg, data, m["dev"], arm, seed, tables)
     counts = np.bincount(data.ids, minlength=len(m["world"].vocab))
     record = {"arm": arm_name, "size": size, "seed": seed, **info, **evaluate(params, cfg, m, counts)}
     record["seconds"] = round(time.time() - start, 1)
@@ -321,10 +366,10 @@ def run(args: argparse.Namespace) -> None:
             if r["settings"] == asdict(settings):
                 done.add((r["arm"], r["size"], r["seed"]))
     max_size = max(args.sizes)
-    # Largest runs first, so the slowest jobs don't start last.
+    # Smallest sizes first: that is where the arms differ, so the informative results come in first.
     jobs = [
         (settings, arm, size, seed, max_size)
-        for size in sorted(args.sizes, reverse=True)
+        for size in sorted(args.sizes)
         for seed in args.seeds
         for arm in args.arms
         if (arm, size, seed) not in done

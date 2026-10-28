@@ -36,6 +36,18 @@ class LabelTest(unittest.TestCase):
         np.testing.assert_array_equal(roles, DATA.roles)
 
 
+class CoarseTableTest(unittest.TestCase):
+    def test_every_class_has_a_coarse_label(self):
+        self.assertTrue(set(WORLD.senses) - {"F"} <= set(tagexp.COARSE))
+
+    def test_rows_hold_the_coarse_labels_of_each_forms_senses(self):
+        table = tagexp.coarse_table(WORLD)
+        self.assertEqual(table.shape, (len(WORLD.vocab), len(tagexp.COARSE_LABELS)))
+        for i, form in enumerate(WORLD.vocab):
+            expected = {tagexp.COARSE.get(s, s) for s in WORLD.senses_of[form]}
+            self.assertEqual({tagexp.COARSE_LABELS[j] for j in np.flatnonzero(table[i])}, expected)
+
+
 class LossTest(unittest.TestCase):
     def test_every_token_after_the_first_is_scored_once(self):
         cfg = tinylm.Config(vocab=len(WORLD.vocab), context=16, width=16, heads=2, layers=1, hidden=32)
@@ -62,7 +74,7 @@ class MultiplierTest(unittest.TestCase):
 
 class EndToEndTest(unittest.TestCase):
     def test_a_tiny_run_produces_a_full_record(self):
-        for arm in ("plain", "roles+sense-sets", "roles+senses-noisy", "random-classes", "roles+sense-sets+lexicon", "random-lexicon"):
+        for arm in tagexp.ARMS:
             record = tagexp.run_one((TINY, arm, 3000, 0, 3000))
             self.assertEqual(record["arm"], arm)
             self.assertLessEqual(record["steps"], TINY.max_steps)
