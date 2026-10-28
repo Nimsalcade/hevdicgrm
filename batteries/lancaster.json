@@ -1,0 +1,63 @@
+{
+  "about": "Lancaster Sensorimotor Norms (Lynott et al. 2020, Behavior Research Methods): 39,707 English words rated 0-5 for six perceptual modalities and five action effectors. Column names follow the published CSV (Word, Haptic.mean, ...) but have not been checked against the file; if they differ, normcheck lists the real headers. Words in that file are upper case, so they are lowercased before asking. The questions paraphrase the original instructions.",
+  "word_column": "Word",
+  "lowercase": true,
+  "state_template": "Word: {word}",
+  "dimensions": {
+    "touch": {
+      "column": "Haptic.mean",
+      "instructions": "To what extent do you experience what this word means by feeling through touch?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "hearing": {
+      "column": "Auditory.mean",
+      "instructions": "To what extent do you experience what this word means by hearing?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "sight": {
+      "column": "Visual.mean",
+      "instructions": "To what extent do you experience what this word means by seeing?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "smell": {
+      "column": "Olfactory.mean",
+      "instructions": "To what extent do you experience what this word means by smelling?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "taste": {
+      "column": "Gustatory.mean",
+      "instructions": "To what extent do you experience what this word means by tasting?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "interoception": {
+      "column": "Interoceptive.mean",
+      "instructions": "To what extent do you experience what this word means by sensations inside your body?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "foot_leg": {
+      "column": "Foot_leg.mean",
+      "instructions": "To what extent do you experience what this word means by performing an action with your foot or leg?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "hand_arm": {
+      "column": "Hand_arm.mean",
+      "instructions": "To what extent do you experience what this word means by performing an action with your hand or arm?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "head": {
+      "column": "Head.mean",
+      "instructions": "To what extent do you experience what this word means by performing an action with your head, not counting the mouth?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "mouth": {
+      "column": "Mouth.mean",
+      "instructions": "To what extent do you experience what this word means by performing an action with your mouth or throat?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    },
+    "torso": {
+      "column": "Torso.mean",
+      "instructions": "To what extent do you experience what this word means by performing an action with your torso?",
+      "levels": ["0 (not at all)", "1", "2", "3", "4", "5 (greatly)"]
+    }
+  }
+}
