@@ -450,6 +450,25 @@ def report(paths: list[Path]) -> str:
         lines.append("")
     lines.append("Multipliers interpolate the plain model's results linearly in log text size; '>' means past the largest size.")
     lines.append("")
+    lines.append("Key comparisons: difference of means (first arm minus second) ± its standard error across seeds")
+    metrics = (("selection", "meaning"), ("agreement", "agreement"), ("sense", "sense"), ("selection_unseen", "unseen"), ("test_loss", "loss"))
+    lines.append(f"{'comparison':<44}{'size':>9}" + "".join(f"{label:>17}" for _, label in metrics))
+    for question, a, b in COMPARISONS:
+        for s in sizes:
+            cells_ = []
+            for key, _ in metrics:
+                va = [r[key] for r in cells.get((a, s), []) if r.get(key) is not None]
+                vb = [r[key] for r in cells.get((b, s), []) if r.get(key) is not None]
+                if len(va) < 2 or len(vb) < 2:
+                    cells_.append("-")
+                    continue
+                diff = sum(va) / len(va) - sum(vb) / len(vb)
+                se = math.sqrt(_variance(va) / len(va) + _variance(vb) / len(vb))
+                scale = 100 if key != "test_loss" else 1
+                cells_.append(f"{diff * scale:+.1f}±{se * scale:.1f}" if key != "test_loss" else f"{diff:+.3f}±{se:.3f}")
+            lines.append(f"{question:<44}{s:>9,}" + "".join(f"{c:>17}" for c in cells_))
+    lines.append("(accuracy differences in percentage points; loss in nats, where negative is better)")
+    lines.append("")
     lines.append("Training steps to first reach the plain model's mean best held-out loss (mean over seeds that reach it)")
     lines.append(f"{'arm':<26}" + "".join(f"{s:>16,}" for s in sizes))
     for arm in arms:
@@ -465,6 +484,42 @@ def report(paths: list[Path]) -> str:
             row.append(f"{sum(reached) / len(reached):.0f} ({len(reached)}/{len(runs)})" if reached else f"never (0/{len(runs)})")
         lines.append(f"{arm:<26}" + "".join(f"{c:>16}" for c in row))
     return "\n".join(lines)
+
+
+EXPORT_FIELDS = (
+    "arm", "size", "seed", "test_loss", "rare_loss", "agreement", "selection",
+    "selection_rare", "selection_unseen", "sense", "dev_loss", "best_step", "steps",
+)  # fmt: skip
+
+
+def export(paths: list[Path]) -> list[dict]:
+    """One flat row per run, for charts: the fields that summarise it, without its learning curve."""
+    rows = []
+    for path in paths:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            r = json.loads(line)
+            rows.append({k: r.get(k) for k in EXPORT_FIELDS})
+    return sorted(rows, key=lambda r: (list(ARMS).index(r["arm"]), r["size"], r["seed"]))
+
+
+# Each comparison isolates one question: (question, arm, the arm it is compared with).
+COMPARISONS = (
+    ("dictionary sense lists vs nothing", "sense-sets", "plain"),
+    ("parser roles vs nothing", "roles", "plain"),
+    ("Jev's sense in context vs sense lists", "senses", "sense-sets"),
+    ("noisy vs perfect roles and senses", "roles+senses-noisy", "roles+senses"),
+    ("coarse vs exact sense lists", "coarse-sense-sets", "sense-sets"),
+    ("random classes (control) vs nothing", "random-classes", "plain"),
+    ("sense lists vs random classes", "sense-sets", "random-classes"),
+    ("lexicon vs nothing", "lexicon", "plain"),
+    ("lexicon vs random lexicon (control)", "lexicon", "random-lexicon"),
+    ("all no-Jev labels vs nothing", "roles+sense-sets+lexicon", "plain"),
+)
+
+
+def _variance(values: list[float]) -> float:
+    mu = sum(values) / len(values)
+    return sum((v - mu) ** 2 for v in values) / (len(values) - 1)
 
 
 def _multiplier(plain: list[tuple[int, float]], size: int, loss: float | None) -> str:
@@ -491,9 +546,14 @@ def main(argv: list[str] | None = None) -> None:
     r.add_argument("--settings", help="JSON overriding fields of Settings, e.g. '{\"dropout\": 0.2}'")
     p = sub.add_parser("report", help="summarise one or more results files")
     p.add_argument("paths", type=Path, nargs="+")
+    e = sub.add_parser("export", help="write one JSON row per run, for charts")
+    e.add_argument("paths", type=Path, nargs="+")
+    e.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "run":
         run(args)
+    elif args.command == "export":
+        args.out.write_text(json.dumps(export(args.paths)), encoding="utf-8")
     else:
         print(report(args.paths))
 
