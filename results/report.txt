@@ -1,0 +1,252 @@
+136 runs. Columns are training tokens; cells average up to 3 seeds.
+
+Held-out loss on raw text (nats per token, lower is better) (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                        3.6097±0.0083   3.2044±0.0122   3.0049±0.0772   2.7540±0.0045   2.6552±0.0016
+roles                        3.3963±0.0136   3.1035±0.0236   2.9084±0.0108          2.7444          2.6686
+sense-sets                   3.6107±0.0063   3.1373±0.0225   2.8625±0.0045          2.7556          2.6673
+senses                       3.6039±0.0030   3.1203±0.0196   2.8529±0.0026          2.7399          2.6686
+roles+sense-sets             3.5339±0.0537   3.0301±0.0336   2.8521±0.0272          2.7402          2.6601
+roles+senses                 3.4453±0.0449   3.0200±0.0235   2.8261±0.0045          2.7284          2.6578
+roles+senses-noisy           3.5643±0.0381   3.0622±0.0197   2.8515±0.0034          2.7431          2.6663
+random-classes               3.6658±0.0057   3.2371±0.0104   3.0102±0.0220          2.8121          2.6851
+lexicon                      3.5214±0.0697   2.9983±0.0314   2.8073±0.0091          2.7058          2.6380
+roles+sense-sets+lexicon     3.2550±0.0105   2.9474±0.0084   2.8001±0.0044          2.7142          2.6568
+random-lexicon               3.6224±0.0036   3.1833±0.0106   2.9859±0.0209          2.7707          2.6533
+coarse-sense-sets            3.5869±0.0001   3.1047±0.0113   2.8647±0.0030          2.7441          2.6587
+
+Loss on words seen at most 10 times in training (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                          7.715±0.050     7.708±0.019     7.983±0.025     7.914±0.112     8.144±0.011
+roles                          7.800±0.084     7.650±0.024     7.892±0.021           8.050           8.170
+sense-sets                     7.768±0.019     7.626±0.037     7.620±0.055           7.886           8.103
+senses                         7.746±0.028     7.658±0.052     7.570±0.060           7.951           8.056
+roles+sense-sets               7.794±0.049     7.540±0.079     7.670±0.040           7.941           8.104
+roles+senses                   7.863±0.023     7.476±0.079     7.587±0.035           7.896           8.200
+roles+senses-noisy             7.762±0.113     7.602±0.058     7.676±0.029           7.830           8.244
+random-classes                 7.829±0.060     7.953±0.032     8.153±0.059           8.235           8.306
+lexicon                        7.558±0.066     7.318±0.044     7.439±0.059           7.716           7.989
+roles+sense-sets+lexicon       7.511±0.124     7.264±0.045     7.481±0.059           7.709           8.082
+random-lexicon                 7.662±0.051     7.823±0.047     7.997±0.041           8.134           8.052
+coarse-sense-sets              7.664±0.009     7.601±0.072     7.764±0.051           7.919           8.103
+
+Agreement across a relative clause (accuracy) (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            62.7%±4.6       68.0%±6.7       61.8%±6.2       93.9%±8.3      100.0%±0.0
+roles                            74.2%±2.6       83.4%±7.4       84.6%±2.5          100.0%          100.0%
+sense-sets                       57.9%±0.9      71.6%±12.3       88.6%±8.0           93.8%           99.3%
+senses                           56.3%±1.7      72.3%±11.7       90.2%±5.8           99.5%          100.0%
+roles+sense-sets                 70.1%±7.1       83.2%±5.7      86.5%±11.0           99.8%          100.0%
+roles+senses                     73.6%±2.5       90.9%±4.6       93.6%±4.5           98.7%          100.0%
+roles+senses-noisy               67.6%±8.4      80.2%±12.2      89.1%±10.0           99.7%          100.0%
+random-classes                   64.0%±1.8      73.9%±14.1       88.9%±6.1           98.5%           99.8%
+lexicon                          72.2%±2.2       68.7%±6.8       66.4%±7.4           74.7%          100.0%
+roles+sense-sets+lexicon         72.4%±2.7       87.1%±8.6       87.9%±9.5           99.5%          100.0%
+random-lexicon                   58.7%±4.3       67.2%±9.3      59.4%±12.2           99.8%          100.0%
+coarse-sense-sets                61.1%±5.5       86.4%±7.5       97.2%±1.3           99.8%           99.5%
+
+Meaning constraints on objects (accuracy, chance 50%) (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            46.0%±0.7       58.8%±3.4      77.1%±20.1       99.7%±0.2      100.0%±0.0
+roles                            52.3%±0.9       60.4%±3.0       88.2%±2.0           99.8%           99.8%
+sense-sets                       54.4%±3.2       96.7%±1.1       99.7%±0.4          100.0%          100.0%
+senses                           53.8%±1.6       98.1%±0.7       99.8%±0.2          100.0%          100.0%
+roles+sense-sets                58.3%±10.4       95.6%±2.0       97.2%±4.1           99.8%          100.0%
+roles+senses                    78.6%±12.1       97.7%±0.8       99.8%±0.2          100.0%          100.0%
+roles+senses-noisy               58.2%±6.3       97.5%±0.8       99.8%±0.4          100.0%          100.0%
+random-classes                   50.3%±3.6       57.9%±2.2      78.4%±12.7           98.7%          100.0%
+lexicon                         57.9%±16.1       97.6%±2.4      100.0%±0.0          100.0%          100.0%
+roles+sense-sets+lexicon         97.3%±1.8       99.8%±0.3       99.9%±0.1          100.0%          100.0%
+random-lexicon                   49.2%±1.7       57.6%±4.8       72.9%±8.0           98.7%          100.0%
+coarse-sense-sets                48.1%±2.8       89.8%±1.5       96.7%±0.5           99.2%          100.0%
+
+... where a noun was seen at most 10 times (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            45.9%±1.5       58.7%±2.8      75.1%±20.4       99.8%±0.4      100.0%±0.0
+roles                            52.9%±1.2       58.7%±3.5       87.1%±1.4          100.0%          100.0%
+sense-sets                       53.1%±3.3       96.2%±1.3       99.6%±0.5          100.0%          100.0%
+senses                           52.9%±0.7       97.6%±0.8       99.7%±0.3          100.0%          100.0%
+roles+sense-sets                 58.0%±9.5       94.5%±2.8       97.0%±4.2          100.0%          100.0%
+roles+senses                    77.9%±12.3       97.3%±1.2       99.7%±0.3          100.0%          100.0%
+roles+senses-noisy               57.5%±6.2       96.9%±1.2       99.7%±0.6          100.0%          100.0%
+random-classes                   49.8%±3.9       56.5%±0.9      75.7%±14.0           98.1%          100.0%
+lexicon                         58.8%±16.2       97.7%±2.5      100.0%±0.0          100.0%          100.0%
+roles+sense-sets+lexicon         97.8%±1.9       99.8%±0.2       99.9%±0.2          100.0%          100.0%
+random-lexicon                   49.2%±1.6       56.4%±4.9       70.7%±7.2           98.1%          100.0%
+coarse-sense-sets                47.1%±2.8       90.5%±1.9       96.7%±0.8           99.0%          100.0%
+
+... where at least one noun never appeared in training (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            44.9%±1.3       54.3%±1.6      72.8%±23.2       97.6%±4.1               -
+roles                            51.8%±1.4       55.2%±6.7       83.0%±2.4          100.0%               -
+sense-sets                       53.0%±0.8       88.6%±4.4       99.3%±1.2          100.0%               -
+senses                           52.5%±2.1       92.1%±1.5       98.0%±2.0          100.0%               -
+roles+sense-sets                 51.8%±4.5       84.8%±7.6      91.2%±13.6          100.0%               -
+roles+senses                    67.4%±12.1       92.1%±3.8       98.0%±2.0          100.0%               -
+roles+senses-noisy               51.8%±6.0       89.8%±3.6       98.6%±2.4          100.0%               -
+random-classes                   48.0%±3.2       49.8%±4.0      73.5%±14.3           78.6%               -
+lexicon                         59.6%±13.6       97.8%±3.1      100.0%±0.0          100.0%               -
+roles+sense-sets+lexicon         97.8%±1.3      100.0%±0.0      100.0%±0.0          100.0%               -
+random-lexicon                   51.8%±1.0       48.9%±3.6       66.7%±1.2           92.9%               -
+coarse-sense-sets                49.1%±3.4       86.7%±2.5       95.2%±5.1          100.0%               -
+
+... where neither noun appeared in training (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                                    -               -               -               -               -
+roles                                    -               -               -               -               -
+sense-sets                               -               -               -               -               -
+senses                                   -               -               -               -               -
+roles+sense-sets                         -               -               -               -               -
+roles+senses                             -               -               -               -               -
+roles+senses-noisy                       -               -               -               -               -
+random-classes                           -               -               -               -               -
+lexicon                                  -               -               -               -               -
+roles+sense-sets+lexicon                 -               -               -               -               -
+random-lexicon                           -               -               -               -               -
+coarse-sense-sets                        -               -               -               -               -
+
+Picking a homonym's sense from context (accuracy, chance 50%) (mean ± standard deviation across seeds)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            55.4%±1.4       70.4%±1.4       76.2%±5.3       93.1%±1.3       97.2%±2.1
+roles                            56.3%±2.5       65.7%±3.9       73.2%±2.5           87.2%           93.7%
+sense-sets                       51.9%±3.6       80.4%±8.8       91.8%±5.2           98.7%           99.8%
+senses                           55.8%±3.2       83.8%±2.9       97.7%±1.3           96.8%           99.8%
+roles+sense-sets                53.3%±10.4       82.1%±0.8      83.8%±13.0           91.7%           97.8%
+roles+senses                     67.1%±8.1       85.7%±5.6       94.6%±1.7           99.5%           99.2%
+roles+senses-noisy               53.9%±4.0       82.8%±7.1       88.7%±4.0           98.0%           99.2%
+random-classes                   52.2%±2.8       66.7%±1.6       76.9%±1.6           89.2%           98.3%
+lexicon                          51.6%±5.5      70.6%±11.3       79.9%±6.9           73.8%           99.5%
+roles+sense-sets+lexicon         68.5%±2.7       85.7%±4.2       94.3%±3.7           89.7%           96.8%
+random-lexicon                   51.3%±1.1       65.0%±5.2       68.4%±3.6           94.7%           99.3%
+coarse-sense-sets                54.3%±2.8       79.3%±4.4       90.6%±2.0           93.5%           99.8%
+
+Text multiplier on held-out loss: how many times more text the plain model needs to match each arm
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                                1.00x           1.00x           1.00x           1.00x           1.00x
+roles                                1.44x           1.42x           1.31x           1.09x           0.88x
+sense-sets                          <1.00x           1.26x           1.48x           1.00x           0.89x
+senses                               1.01x           1.34x           1.52x           1.14x           0.88x
+roles+sense-sets                     1.14x           1.83x           1.53x           1.14x           0.96x
+roles+senses                         1.32x           1.90x           1.64x           1.27x           0.98x
+roles+senses-noisy                   1.08x           1.64x           1.53x           1.11x           0.90x
+random-classes                      <1.00x           0.95x           0.98x           0.85x           0.76x
+lexicon                              1.16x           2.04x           1.73x           1.56x           >1.0x
+roles+sense-sets+lexicon             1.83x           2.34x           1.76x           1.45x           0.98x
+random-lexicon                      <1.00x           1.08x           1.05x           0.95x           >1.0x
+coarse-sense-sets                    1.04x           1.41x           1.47x           1.10x           0.97x
+
+Text multiplier on meaning-constraint accuracy: how many times more text the plain model needs to match each arm
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                                1.00x           1.00x           1.00x               -               -
+roles                                1.41x           1.06x           1.40x               -               -
+sense-sets                           1.57x           3.65x         >=1.96x               -               -
+senses                               1.53x           3.81x         >=1.96x               -               -
+roles+sense-sets                     1.94x           3.52x           1.85x               -               -
+roles+senses                         4.19x           3.76x         >=1.96x               -               -
+roles+senses-noisy                   1.94x           3.74x         >=1.96x               -               -
+random-classes                       1.26x           0.95x           1.04x           0.97x               -
+lexicon                              1.91x           3.74x         >=1.96x               -               -
+roles+sense-sets+lexicon             7.44x         >=3.91x         >=1.96x               -               -
+random-lexicon                       1.19x           0.94x           0.86x           0.97x               -
+coarse-sense-sets                    1.12x           2.96x           1.82x               -               -
+
+Text multiplier on agreement accuracy: how many times more text the plain model needs to match each arm
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                                1.00x           1.00x           1.00x           1.00x               -
+roles                                5.23x           3.19x           1.63x         >=2.15x               -
+sense-sets                          <1.00x           2.47x           1.78x           1.00x               -
+senses                              <1.00x           2.51x           1.85x         >=2.15x               -
+roles+sense-sets                     4.78x           3.18x           1.70x         >=2.15x               -
+roles+senses                         5.15x           3.75x           1.99x           2.05x               -
+roles+senses-noisy                   1.89x           2.98x           1.80x         >=2.15x               -
+random-classes                       1.19x           2.60x           1.80x           2.00x               -
+lexicon                              5.00x           2.32x           0.41x           0.66x               -
+roles+sense-sets+lexicon             5.03x           3.45x           1.76x         >=2.15x               -
+random-lexicon                      <1.00x           0.90x          <0.25x         >=2.15x               -
+coarse-sense-sets                   <1.00x           3.40x           3.27x         >=2.15x               -
+
+Text multiplier on sense-in-context accuracy: how many times more text the plain model needs to match each arm
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                                1.00x           1.00x           1.00x           1.00x           1.00x
+roles                                1.04x           0.80x           0.70x           0.78x           0.45x
+sense-sets                          <1.00x           2.38x           1.90x           >2.5x         >=>1.0x
+senses                               1.02x           2.74x           >5.0x           2.29x         >=>1.0x
+roles+sense-sets                    <1.00x           2.54x           1.37x           0.94x           >1.0x
+roles+senses                         1.71x           2.96x           2.79x         >=>2.5x         >=>1.0x
+roles+senses-noisy                  <1.00x           2.63x           1.67x           >2.5x         >=>1.0x
+random-classes                      <1.00x           0.84x           1.03x           0.85x           >1.0x
+lexicon                             <1.00x           1.02x           1.16x           0.38x         >=>1.0x
+roles+sense-sets+lexicon             1.83x           2.95x           2.59x           0.87x           0.92x
+random-lexicon                      <1.00x           0.78x           0.46x           1.41x         >=>1.0x
+coarse-sense-sets                   <1.00x           2.28x           1.81x           1.09x         >=>1.0x
+
+Multipliers interpolate the plain model's results linearly in log text size; '>' means past the largest size.
+
+Key comparisons: difference of means (first arm minus second) ± its standard error across seeds
+comparison                                       size          meaning        agreement            sense           unseen             loss
+dictionary sense lists vs nothing              10,000         +8.4±1.9         -4.8±2.7         -3.4±2.2         +8.1±0.9     +0.001±0.006
+dictionary sense lists vs nothing              20,000        +37.9±2.1         +3.6±8.1         +9.9±5.1        +34.3±2.7     -0.067±0.015
+dictionary sense lists vs nothing              40,000       +22.6±11.6        +26.7±5.8        +15.7±4.3       +26.5±13.4     -0.142±0.045
+dictionary sense lists vs nothing              80,000                -                -                -                -                -
+dictionary sense lists vs nothing             200,000                -                -                -                -                -
+parser roles vs nothing                        10,000         +6.3±0.7        +11.6±3.0         +0.9±1.7         +6.9±1.1     -0.213±0.009
+parser roles vs nothing                        20,000         +1.6±2.6        +15.4±5.7         -4.8±2.4         +1.0±4.0     -0.101±0.015
+parser roles vs nothing                        40,000       +11.1±11.7        +22.7±3.9         -3.0±3.4       +10.2±13.5     -0.096±0.045
+parser roles vs nothing                        80,000                -                -                -                -                -
+parser roles vs nothing                       200,000                -                -                -                -                -
+Jev's sense in context vs sense lists          10,000         -0.6±2.1         -1.6±1.1         +3.9±2.8         -0.5±1.3     -0.007±0.004
+Jev's sense in context vs sense lists          20,000         +1.4±0.7         +0.8±9.8         +3.4±5.3         +3.5±2.7     -0.017±0.017
+Jev's sense in context vs sense lists          40,000         +0.1±0.3         +1.6±5.7         +5.8±3.1         -1.4±1.4     -0.010±0.003
+Jev's sense in context vs sense lists          80,000                -                -                -                -                -
+Jev's sense in context vs sense lists         200,000                -                -                -                -                -
+noisy vs perfect roles and senses              10,000        -20.4±7.9         -6.0±5.1        -13.1±5.2        -15.5±7.8     +0.119±0.034
+noisy vs perfect roles and senses              20,000         -0.2±0.6        -10.7±7.5         -2.9±5.2         -2.2±3.0     +0.042±0.018
+noisy vs perfect roles and senses              40,000         -0.1±0.2         -4.4±6.3         -5.9±2.5         +0.7±1.8     +0.025±0.003
+noisy vs perfect roles and senses              80,000                -                -                -                -                -
+noisy vs perfect roles and senses             200,000                -                -                -                -                -
+coarse vs exact sense lists                    10,000         -6.3±2.5         +3.2±3.2         +2.4±2.6         -4.0±2.0     -0.024±0.004
+coarse vs exact sense lists                    20,000         -6.9±1.1        +14.8±8.3         -1.1±5.7         -1.9±2.9     -0.033±0.015
+coarse vs exact sense lists                    40,000         -3.0±0.4         +8.6±4.7         -1.2±3.2         -4.1±3.0     +0.002±0.003
+coarse vs exact sense lists                    80,000                -                -                -                -                -
+coarse vs exact sense lists                   200,000                -                -                -                -                -
+random classes (control) vs nothing            10,000         +4.3±2.1         +1.3±2.8         -3.2±1.8         +3.1±2.0     +0.056±0.006
+random classes (control) vs nothing            20,000         -0.9±2.3         +5.9±9.0         -3.7±1.2         -4.4±2.5     +0.033±0.009
+random classes (control) vs nothing            40,000        +1.4±13.7        +27.1±5.0         +0.7±3.2        +0.7±15.7     +0.005±0.046
+random classes (control) vs nothing            80,000                -                -                -                -                -
+random classes (control) vs nothing           200,000                -                -                -                -                -
+sense lists vs random classes                  10,000         +4.1±2.8         -6.1±1.1         -0.2±2.6         +5.0±1.9     -0.055±0.005
+sense lists vs random classes                  20,000        +38.8±1.4        -2.4±10.8        +13.7±5.1        +38.7±3.4     -0.100±0.014
+sense lists vs random classes                  40,000        +21.2±7.4         -0.3±5.8        +14.9±3.1        +25.9±8.3     -0.148±0.013
+sense lists vs random classes                  80,000                -                -                -                -                -
+sense lists vs random classes                 200,000                -                -                -                -                -
+lexicon vs nothing                             10,000        +11.9±9.3         +9.5±2.9         -3.8±3.3        +14.7±7.9     -0.088±0.041
+lexicon vs nothing                             20,000        +38.7±2.4         +0.7±5.5         +0.2±6.6        +43.5±2.0     -0.206±0.019
+lexicon vs nothing                             40,000       +22.9±11.6         +4.6±5.6         +3.7±5.0       +27.2±13.4     -0.198±0.045
+lexicon vs nothing                             80,000                -                -                -                -                -
+lexicon vs nothing                            200,000                -                -                -                -                -
+lexicon vs random lexicon (control)            10,000         +8.7±9.3        +13.4±2.8         +0.2±3.2         +7.8±7.9     -0.101±0.040
+lexicon vs random lexicon (control)            20,000        +39.9±3.1         +1.5±6.7         +5.6±7.2        +48.9±2.7     -0.185±0.019
+lexicon vs random lexicon (control)            40,000        +27.1±4.6         +7.1±8.2        +11.4±4.5        +33.3±0.7     -0.179±0.013
+lexicon vs random lexicon (control)            80,000                -                -                -                -                -
+lexicon vs random lexicon (control)           200,000                -                -                -                -                -
+all no-Jev labels vs nothing                   10,000        +51.3±1.1         +9.8±3.1        +13.1±1.8        +52.8±1.1     -0.355±0.008
+all no-Jev labels vs nothing                   20,000        +40.9±2.0        +19.1±6.3        +15.2±2.5        +45.7±1.0     -0.257±0.009
+all no-Jev labels vs nothing                   40,000       +22.9±11.6        +26.1±6.5        +18.1±3.7       +27.2±13.4     -0.205±0.045
+all no-Jev labels vs nothing                   80,000                -                -                -                -                -
+all no-Jev labels vs nothing                  200,000                -                -                -                -                -
+(accuracy differences in percentage points; loss in nats, where negative is better)
+
+Training steps to first reach the plain model's mean best held-out loss (mean over seeds that reach it)
+arm                                 10,000          20,000          40,000          80,000         200,000
+plain                            155 (2/3)       400 (1/3)       600 (2/3)      1273 (2/3)      2112 (2/3)
+roles                            110 (3/3)       273 (3/3)       410 (3/3)      1235 (1/1)     never (0/1)
+sense-sets                       140 (1/3)       393 (3/3)       413 (3/3)     never (0/1)     never (0/1)
+senses                           137 (3/3)       377 (3/3)       387 (3/3)       722 (1/1)     never (0/1)
+roles+sense-sets                 127 (3/3)       310 (3/3)       360 (3/3)       817 (1/1)     never (0/1)
+roles+senses                     117 (3/3)       307 (3/3)       353 (3/3)       722 (1/1)     never (0/1)
+roles+senses-noisy               133 (3/3)       363 (3/3)       427 (3/3)       817 (1/1)     never (0/1)
+random-classes                 never (0/3)     never (0/3)       700 (1/3)     never (0/1)     never (0/1)
+lexicon                          110 (3/3)       330 (3/3)       427 (3/3)       741 (1/1)      1200 (1/1)
+roles+sense-sets+lexicon         110 (3/3)       263 (3/3)       337 (3/3)       589 (1/1)     never (0/1)
+random-lexicon                 never (0/3)       435 (2/3)       675 (2/3)     never (0/1)      2832 (1/1)
+coarse-sense-sets                117 (3/3)       343 (3/3)       373 (3/3)       817 (1/1)     never (0/1)
